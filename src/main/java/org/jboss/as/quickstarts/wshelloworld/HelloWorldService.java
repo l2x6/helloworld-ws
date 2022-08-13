@@ -26,9 +26,10 @@ import javax.jws.WebService;
  * @author lnewson@redhat.com
  */
 
-@WebService(targetNamespace = "http://www.jboss.org/eap/quickstarts/wshelloworld/HelloWorld")
+@WebService(targetNamespace = HelloWorldService.TARGET_NS)
 public interface HelloWorldService {
 
+    public static final String TARGET_NS = "http://www.jboss.org/eap/quickstarts/wshelloworld/HelloWorld";
     /**
      * Say hello as a response
      *

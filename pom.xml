@@ -45,9 +45,10 @@
     <properties>
         <!-- The versions for BOMs, Dependencies and Plugins -->
         <version.server.bom>26.1.1.Final</version.server.bom>
+        <version.assertj>3.23.1</version.assertj>
 
         <!-- A base list of dependency and plug-in version used in the various quick starts. -->
-        <version.wildfly.maven.plugin>2.0.2.Final</version.wildfly.maven.plugin>
+        <version.wildfly.maven.plugin>4.0.0.Beta3</version.wildfly.maven.plugin>
         <!-- other plug-in versions -->
         <version.com.mycyla.license>3.0</version.com.mycyla.license>
         <!-- Explicitly declaring the source encoding eliminates the following
@@ -115,6 +116,20 @@
             <artifactId>jboss-jaxws-api_2.3_spec</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${version.assertj}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>rt</artifactId>
+            <version>2.3.1</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -158,10 +173,52 @@
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
-                <version>4.0.0.Beta3</version>
                 <configuration>
+                    <feature-packs>
+                        <feature-pack>
+                            <location>org.wildfly:wildfly-galleon-pack:26.1.1.Final</location>
+                        </feature-pack>
+                    </feature-packs>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>package-wildfly</id>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>start-wildfly</id>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <javaOpts>-Djboss.http.port=8088</javaOpts>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stop-wildfly</id>
+                        <goals>
+                            <goal>shutdown</goal>
+                        </goals>
+                        <phase>post-integration-test</phase>
+                    </execution>
+                </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
         <pluginManagement>
             <plugins>
@@ -169,20 +226,6 @@
                     <groupId>org.wildfly.plugins</groupId>
                     <artifactId>wildfly-maven-plugin</artifactId>
                     <version>${version.wildfly.maven.plugin}</version>
-                    <configuration>
-                        <feature-packs>
-                            <feature-pack>
-                                <location>org.wildfly:wildfly-galleon-pack:26.1.1.Final</location>
-                            </feature-pack>
-                        </feature-packs>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>package</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
